@@ -152,6 +152,7 @@ class Query(graphene.ObjectType):
     all_customers = graphene.List(CustomerType)
     all_products = graphene.List(ProductType)
     all_orders = graphene.List(OrderType)
+    get_customer = graphene.List(CustomerType, customer_id=graphene.Int())
 
     def resolve_all_customers(self, info):
         return Customer.objects.all()
@@ -161,6 +162,9 @@ class Query(graphene.ObjectType):
 
     def resolve_all_orders(self, info):
         return Order.objects.all()
+
+    def resolve_get_customer(self, info, customer_id):
+        return Customer.objects.filter(id=customer_id)
 
 
 class Mutation(graphene.ObjectType):
