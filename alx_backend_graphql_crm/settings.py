@@ -127,4 +127,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CRONJOBS = [
     ('*/5 * * * *', 'crm.cron.logcrmheartbeat'),
+    ('0 */12 * * *', 'crm.cron.update_low_stock'),
 ]

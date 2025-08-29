@@ -50,3 +50,48 @@ def log_crm_heartbeat():
                 error_log.write(error_message)
         except:
             print(f"FATAL ERROR: Could not write to any log file: {error_message}", file=os.sys.stderr)
+
+def update_low_stock():
+    """
+    Executes a GraphQL mutation to update low-stock products and logs the updates.
+    """
+    LOW_STOCK_LOG_FILE = "/tmp/low_stock_updates_log.txt"
+    current_timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    try:
+        transport = RequestsHTTPTransport(url=GRAPHQL_ENDPOINT, verify=False, retries=3)
+        client = Client(transport=transport, fetch_schema_from_transport=True)
+
+        mutation = gql(
+            """
+            mutation {
+                updateLowStockProducts {
+                    products {
+                        id
+                        name
+                        stock
+                    }
+                    message
+                }
+            }
+            """
+        )
+
+        result = client.execute(mutation)
+        updated_products_info = result.get('updateLowStockProducts', {})
+        products = updated_products_info.get('products', [])
+        message = updated_products_info.get('message', 'No message from mutation.')
+
+        with open(LOW_STOCK_LOG_FILE, "a") as log_file:
+            log_file.write(f"[{current_timestamp}] {message}\n")
+            if products:
+                for product in products:
+                    log_file.write(f"  - Product ID: {product['id']}, Name: {product['name']}, New Stock: {product['stock']}\n")
+            else:
+                log_file.write(f"[{current_timestamp}] No products updated.\n")
+
+    except Exception as e:
+        error_message = f"[{current_timestamp}] Error updating low stock products: {e}\n"
+        with open(LOW_STOCK_LOG_FILE, "a") as log_file:
+            log_file.write(error_message)
+        print(f"Error updating low stock products: {e}", file=os.sys.stderr)

@@ -158,8 +158,7 @@ class CreateOrder(graphene.Mutation):
             raise Exception("At least one product must be selected.")
 
         products = Product.objects.filter(id__in=product_ids)
-        if products.count() != len(product_ids):
-            raise Exception("One or more product IDs are invalid.")
+        if products.count() != len(product_ids):\n            raise Exception("One or more product IDs are invalid.")
 
         total_amount = sum([p.price for p in products])
 
@@ -167,6 +166,30 @@ class CreateOrder(graphene.Mutation):
         order.save()
         order.products.set(products)
         return CreateOrder(order=order)
+
+
+class UpdateLowStockProducts(graphene.Mutation):
+    class Arguments:
+        # No arguments needed, as it queries based on internal logic (stock < 10)
+        pass
+
+    products = graphene.List(ProductNode)
+    message = graphene.String()
+
+    def mutate(self, info):
+        updated_products = []
+        low_stock_products = Product.objects.filter(stock__lt=10)
+
+        if not low_stock_products.exists():
+            return UpdateLowStockProducts(products=[], message="No low stock products found to update.")
+
+        for product in low_stock_products:
+            product.stock += 10 # Increment stock by 10
+            product.save()
+            updated_products.append(product)
+
+        message = f"Successfully restocked {len(updated_products)} products."
+        return UpdateLowStockProducts(products=updated_products, message=message)
 
 
 # ###############
@@ -217,3 +240,4 @@ class Mutation(graphene.ObjectType):
     bulk_create_customers = BulkCreateCustomers.Field()
     create_product = CreateProduct.Field()
     create_order = CreateOrder.Field()
+    update_low_stock_products = UpdateLowStockProducts.Field()
