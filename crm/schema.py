@@ -1,12 +1,12 @@
 import graphene
 from graphene_django.types import DjangoObjectType
-from .models import Customer, Product, Order
+from .models import Customer, Order
 from django.db import transaction
 from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
 from graphene_django.filter import DjangoFilterConnectionField
 from crm.filters import CustomerFilter, ProductFilter, OrderFilter
-
+from crm.models import Product
 
 # ==============================
 # GraphQL Types
