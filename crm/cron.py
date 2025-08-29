@@ -5,9 +5,9 @@ from gql.transport.requests import RequestsHTTPTransport
 
 # Define the GraphQL endpoint
 GRAPHQL_ENDPOINT = "http://localhost:8000/graphql"
-LOG_FILE_PATH = "/tmp/crm_heartbeat_log.txt"
+LOG_FILE_PATH = "/tmp/crmheartbeatlog.txt"
 
-def log_crm_heartbeat():
+def logcrmheartbeat():
     """
     Logs a heartbeat message to a file and optionally queries the GraphQL endpoint
     to verify its responsiveness.
