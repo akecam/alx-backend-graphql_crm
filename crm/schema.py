@@ -183,6 +183,8 @@ class Query(graphene.ObjectType):
     order = graphene.relay.Node.Field(OrderNode)
     all_orders = DjangoFilterConnectionField(OrderNode, order_by=graphene.List(of_type=graphene.String))
 
+    all_orders_for_customers_less_than_year = DjangoFilterConnectionField(OrderNode, order_by=graphene.List(of_type=graphene.String))
+
     # Add ordering logic
     def resolve_all_customers(self, info, order_by=None, **kwargs):
         qs = Customer.objects.all()
@@ -197,6 +199,13 @@ class Query(graphene.ObjectType):
         return qs
 
     def resolve_all_orders(self, info, order_by=None, **kwargs):
+        qs = Order.objects.all()
+        if order_by:
+            qs = qs.order_by(*order_by)
+        return qs
+
+    def resolve_all_orders_less_than_year(self, info, order_by=None, **kwargs):
+        print(order_by)
         qs = Order.objects.all()
         if order_by:
             qs = qs.order_by(*order_by)
