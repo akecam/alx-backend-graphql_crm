@@ -3,6 +3,7 @@ from datetime import datetime
 from celery import shared_task
 from gql import Client, gql
 from gql.transport.requests import RequestsHTTPTransport
+import requests
 
 # Define the GraphQL endpoint
 GRAPHQL_ENDPOINT = "http://localhost:8000/graphql"
